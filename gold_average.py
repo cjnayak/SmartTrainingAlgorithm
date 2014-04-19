@@ -27,5 +27,6 @@ class goldAvg(MRJob):
         """
         return [self.mr(self.extract_gold, self.avg_gold)]
 
+
 if __name__ == '__main__':
     goldAvg.run()
