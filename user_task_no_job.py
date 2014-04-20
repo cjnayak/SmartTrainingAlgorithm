@@ -41,10 +41,14 @@ def calculate_avg_score_per_batch(batch_dict):
 	for batch in batch_dict:
 		average_batch_score[batch] = [float(sum(batch_dict[batch]))/float(len(batch_dict[batch])), numpy.std(batch_dict[batch]), float(len(batch_dict[batch]))]
 	return average_batch_score
-test_def = calculate_avg_score_per_batch(users[105]["batch"])
-global_batch = calculate_avg_score_per_batch(batch_score)
-#print global_batch
 
+#test out calculate_avg_score_per_batch on user 105
+test_def = calculate_avg_score_per_batch(users[105]["batch"])
+
+#run calculate_avg_score_per_batch on the global user scores
+global_batch = calculate_avg_score_per_batch(batch_score)
+
+#this is the test parameter for a particular batch/project we are looking at so we exclude it from their aggregate score
 exclude_batch = 892
 def calc_user_performance(user_btch_avgs, global_batch_averages, exld):
 	user_performance = {}
@@ -56,6 +60,9 @@ def calc_user_performance(user_btch_avgs, global_batch_averages, exld):
 		 			user_performance[ubatch] = (user_btch_avgs[ubatch][0] - global_batch_averages[project][0])/global_batch_averages[project][1]
 	return user_performance
 
+#We need to decide how we are aggregating the total score- we want to encourage higher score
+
+#Testing it out on user 105
 one_o_five_perf = calc_user_performance(test_def, global_batch, exclude_batch)
 print one_o_five_perf
 
