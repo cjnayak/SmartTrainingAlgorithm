@@ -1,4 +1,5 @@
 import json
+import numpy
 from pprint import pprint
 
 with open('Getty_Gold.json') as data_file:    
@@ -29,17 +30,15 @@ for i in range(len(data)):
 			batch_score[c_batchID].append(0)
 
 average_batch_score = {}
+# Calc average 
 for batch in batch_score:
-	average_batch_score[batch] = float(sum(batch_score[batch]))/float(len(batch_score[batch]))
+	average_batch_score[batch] = [float(sum(batch_score[batch]))/float(len(batch_score[batch])), numpy.std(batch_score[batch])]
 
 
-
-#average_batch_score
 
 
 
 print users
 print len(users)
-print batch_score
 print average_batch_score
 
