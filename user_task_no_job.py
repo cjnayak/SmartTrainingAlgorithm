@@ -1,11 +1,10 @@
 import json
-import numpy
-from pprint import pprint
+import numpy as np
+import matplotlib.pyplot as plt
 
 with open('Getty_Gold.json') as data_file:    
     data = json.load(data_file)
 
-print len(data)
 users = {}
 batch_score = {}
 for i in range(len(data)):
@@ -39,17 +38,13 @@ def calculate_avg_score_per_batch(batch_dict):
 	average_batch_score = {}
 	# Calc average number, standard deviation of batch, number of jobs, 
 	for batch in batch_dict:
-		average_batch_score[batch] = [float(sum(batch_dict[batch]))/float(len(batch_dict[batch])), numpy.std(batch_dict[batch]), float(len(batch_dict[batch]))]
+		average_batch_score[batch] = [float(sum(batch_dict[batch]))/float(len(batch_dict[batch])), np.std(batch_dict[batch]), float(len(batch_dict[batch]))]
 	return average_batch_score
-
-#test out calculate_avg_score_per_batch on user 105
-test_def = calculate_avg_score_per_batch(users[105]["batch"])
 
 #run calculate_avg_score_per_batch on the global user scores
 global_batch = calculate_avg_score_per_batch(batch_score)
 
-#this is the test parameter for a particular batch/project we are looking at so we exclude it from their aggregate score
-exclude_batch = 892
+#calucuates z score for each batch then averages them to generate an average performance metric
 def calc_user_performance(user_btch_avgs, global_batch_averages, exld):
 	user_performance = {}
 	for ubatch in user_btch_avgs:
@@ -58,14 +53,43 @@ def calc_user_performance(user_btch_avgs, global_batch_averages, exld):
 		 		if project != exclude_batch:
 		 			#Calculate a z-score for the user's performance = (user's batch % - project avg)/std. for the project
 		 			user_performance[ubatch] = (user_btch_avgs[ubatch][0] - global_batch_averages[project][0])/global_batch_averages[project][1]
-	return user_performance
+	tot_z = 0
+	len_z = 0
+	for b in user_performance:
+		tot_z += user_performance[b]
+		len_z +=1
+	avg_z = tot_z/len(user_performance)
+	return user_performance, avg_z
 
-#We need to decide how we are aggregating the total score- we want to encourage higher score
+#test out calculate_avg_score_per_batch on user 105
+test_def = calculate_avg_score_per_batch(users[105]["batch"])
+
+#this is the test parameter for a particular batch/project we are looking at so we exclude it from their aggregate score
+exclude_batch = 892
 
 #Testing it out on user 105
-one_o_five_perf = calc_user_performance(test_def, global_batch, exclude_batch)
-print one_o_five_perf
+#one_o_five_perf, aveg_oofive = calc_user_performance(test_def, global_batch, exclude_batch)
+#print one_o_five_perf
+#print aveg_oofive
 
+#Implement as a loop
 #print users
-#print len(users)
-#print average_batch_score
+
+scores = {}
+for user in users:
+	scores[user] = {}
+	scores[user]["batch"], scores[user]["av"] = calc_user_performance(users[user]["batch"], global_batch, exclude_batch)
+
+score_array = []
+for score in scores:
+	score_array.append(scores[score]["av"])
+score_array.sort()
+
+plt.hist(score_array, 50)
+plt.ylabel('Average Score Distribution')
+plt.show()
+
+	
+
+#print scores
+
