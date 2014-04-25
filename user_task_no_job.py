@@ -43,8 +43,10 @@ def calculate_avg_score_per_batch(batch_dict):
 		average_batch_score[batch] = [float(sum(batch_dict[batch]))/float(len(batch_dict[batch])), np.std(batch_dict[batch]), float(len(batch_dict[batch]))]
 	return average_batch_score
 
+
 #run calculate_avg_score_per_batch on the global user scores
 global_batch = calculate_avg_score_per_batch(batch_score)
+
 
 #calucuates z score for each batch then averages them to generate an average performance metric
 def calc_user_performance(user_btch_avgs, global_batch_averages, exld):
@@ -63,8 +65,10 @@ def calc_user_performance(user_btch_avgs, global_batch_averages, exld):
 	avg_z = tot_z/len(user_performance)
 	return user_performance, avg_z
 
+
 #test out calculate_avg_score_per_batch on user 105
 test_def = calculate_avg_score_per_batch(users[105]["batch"])
+
 
 #this is the test parameter for a particular batch/project we are looking at so we exclude it from their aggregate score
 exclude_batch = 892
@@ -75,7 +79,7 @@ exclude_batch = 892
 #print aveg_oofive
 
 #Implement as a loop
-#print users
+
 
 scores = {}
 for user in users:
