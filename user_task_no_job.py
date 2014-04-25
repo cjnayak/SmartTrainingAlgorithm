@@ -2,39 +2,41 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 
-with open('Getty_Gold.json') as data_file:    
-    data = json.load(data_file)
 
-users = {}
-batch_score = {}
-for i in range(len(data)):
-	#exclude Sama Source HQ tests
-	if data[i]["delivery_centers.id"] != "1":
-		batchID = data[i]["gold_metrics.batch_id"]
-		c_batchID = int(str(batchID))
-		if data[i]["gold_metrics.is_correct"] == "Yes":
-			corr = 1
-		else:
-			corr = 0
-		uid = int(str(data[i]["users.id"]))
-		if uid not in users:
-			users[uid] = {"tasks": 0, "batch": {} }
+def readData(json_file):
+	with open(json_file) as data_file:    
+	    data = json.load(data_file)
+	users = {}
+	batch_score = {}
+	for i in range(len(data)):
+		#exclude Sama Source HQ tests
+		if data[i]["delivery_centers.id"] != "1":
+			batchID = data[i]["gold_metrics.batch_id"]
+			c_batchID = int(str(batchID))
+			if data[i]["gold_metrics.is_correct"] == "Yes":
+				corr = 1
+			else:
+				corr = 0
+			uid = int(str(data[i]["users.id"]))
+			if uid not in users:
+				users[uid] = {"tasks": 0, "batch": {} }
+				
+				#users[uid]["batch"].append(c_batchID)
+				#users[uid]["score"].append(corr)
+			users[uid]["tasks"] += 1
+
+			if batchID in batch_score:
+				batch_score[c_batchID].append(corr)
+			else:
+				batch_score.setdefault(c_batchID, [])
+				batch_score[c_batchID].append(corr)
 			
-			#users[uid]["batch"].append(c_batchID)
-			#users[uid]["score"].append(corr)
-		users[uid]["tasks"] += 1
-
-		if batchID in batch_score:
-			batch_score[c_batchID].append(corr)
-		else:
-			batch_score.setdefault(c_batchID, [])
-			batch_score[c_batchID].append(corr)
-		
-		if batchID in users[uid]["batch"]:
-			users[uid]["batch"][c_batchID].append(corr)
-		else:
-			users[uid]["batch"].setdefault(c_batchID, [])
-			users[uid]["batch"][c_batchID].append(corr)
+			if batchID in users[uid]["batch"]:
+				users[uid]["batch"][c_batchID].append(corr)
+			else:
+				users[uid]["batch"].setdefault(c_batchID, [])
+				users[uid]["batch"][c_batchID].append(corr)
+	return users, batch_score
 
 def calculate_avg_score_per_batch(batch_dict):
 	average_batch_score = {}
@@ -74,7 +76,7 @@ test_def = calculate_avg_score_per_batch(users[105]["batch"])
 exclude_batch = 892
 
 #Testing it out on user 105
-#one_o_five_perf, aveg_oofive = calc_user_performance(test_def, global_batch, exclude_batch)
+one_o_five_perf, aveg_oofive = calc_user_performance(test_def, global_batch, exclude_batch)
 #print one_o_five_perf
 #print aveg_oofive
 
@@ -115,7 +117,7 @@ def gatingFrequencyStepWise(user_past_score, current_batch_score, average_time_s
 		number_of_questions_before_gold += number_of_questions_before_gold*reduction_rate
 	if current_batch_score > current_threshold:
 		number_of_questions_before_gold += number_of_questions_before_gold*reduction_rate
-	if average_time_score > time_threshold:
+	if average_time_score < time_threshold:
 		number_of_questions_before_gold += number_of_questions_before_gold*reduction_rate
 	
 	return number_of_questions_before_gold
@@ -133,9 +135,9 @@ def gatingFrequencyStepWisePenalty(user_past_score, current_batch_score, average
 	if current_batch_score < (current_threshold - penalty):
 		number_of_questions_before_gold -= number_of_questions_before_gold*reduction_rate
 
-	if average_time_score > time_threshold:
+	if average_time_score < time_threshold:
 		number_of_questions_before_gold += number_of_questions_before_gold*reduction_rate
-	if average_time_score < (time_threshold - penalty):
+	if average_time_score > (time_threshold - penalty):
 		number_of_questions_before_gold -= number_of_questions_before_gold*reduction_rate
 	
 	return number_of_questions_before_gold
@@ -149,11 +151,29 @@ def gatingFrequencyAttenuated(user_past_score, current_batch_score, average_time
 		number_of_questions_before_gold += number_of_questions_before_gold*reduction_rate*(current_batch_score - current_threshold)
 
 	#time would need a weighting constant
-	if average_time_score > time_threshold:
+	if average_time_score < time_threshold:
 		number_of_questions_before_gold += number_of_questions_before_gold*reduction_rate*(average_time_score - time_threshold)
 	
 	return number_of_questions_before_gold	
 
+def gatingFrequencyAttenuatedContinous(user_past_score, current_batch_score, average_time_score, past_threshold, current_threshold, time_threshold, reduction_rate, base):
+	number_of_questions_before_gold = base
+	number_of_questions_before_gold += number_of_questions_before_gold*reduction_rate*(user_past_score-past_threshold) + number_of_questions_before_gold*reduction_rate*(current_batch_score - current_threshold) + number_of_questions_before_gold*reduction_rate*(average_time_score - time_threshold)
+	return number_of_questions_before_gold	
+
 #print scores
+
+#test gating algorthim
+stw = gatingFrequencyStepWise(score_array[104], 0.25612226458999177, -0.4, 0, 0, 0, 0.9, 10 )
+stwpen = gatingFrequencyStepWisePenalty(score_array[104], 0.25612226458999177, -0.4, 0, 0, 0, 0.9, 10, 0.5 )
+atten = gatingFrequencyAttenuated(score_array[104], 0.25612226458999177, -0.4, 0, 0, 0, 0.9, 10 )
+attenCont = gatingFrequencyAttenuatedContinous(score_array[104], 0.25612226458999177, -0.4, 0, 0, 0, 0.9, 10 )
+
+print score_array[104]
+print stw
+print stwpen
+print atten
+print attenCont
+
 
 
