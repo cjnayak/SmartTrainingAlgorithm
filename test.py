@@ -136,11 +136,13 @@ def calc_user_performance(user_btch_avgs, global_batch_averages, exld):
 def calc_user_performance_dc(user_btch_avgs, dc_batch_averages, exld):
 	user_performance = {}
 	for ubatch in user_btch_avgs:
-	 	for project in dc_batch_averages:
-	 		if ubatch == project:
-		 		if project != exclude_batch:
-		 			#Calculate a z-score for the user's performance = (user's batch % - project avg)/std. for the project
-		 			user_performance[ubatch] = (user_btch_avgs[ubatch][0] - global_batch_averages[project][0])/global_batch_averages[project][1]
+		for dcid in usersdc:
+	 		for project in dc_batch_averages:
+	 			if ubatch == project:
+					if dcid == dc:
+		 				if project != exclude_batch:
+		 					#Calculate a z-score for the user's performance = (user's batch % - project avg)/std. for the project
+		 					user_performance[ubatch] = (user_btch_avgs[ubatch][0] - global_batch_averages[project][0])/global_batch_averages[project][1]
 	tot_z = 0
 	len_z = 0
 	for b in user_performance:
@@ -153,8 +155,9 @@ def calc_user_performance_dc(user_btch_avgs, dc_batch_averages, exld):
 #test out calculate_avg_score_per_batch on user 105
 test_def = calculate_avg_score_per_batch(users_proj[105]["batch"])
 test_def2 = calculate_avg_score_per_batch(users_dur[105]["batch"])
+test_def3 = calculate_avg_score_per_batch(dc_proj[2]["batch"])
 
-
+print test_def3
 #this is the test parameter for a particular batch/project we are looking at so we exclude it from their aggregate score
 exclude_batch = 892
 
