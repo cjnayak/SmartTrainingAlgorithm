@@ -50,17 +50,5 @@ if __name__ == "__main__":
 	print atten
 	print attenCont
 
-###OLD CODE
-#test out calculate_avg_score_per_batch on user 105
-#test_def = calculate_avg_score_per_batch(users[105]["batch"])
-
-#Testing it out on user 105
-#one_o_five_perf, aveg_oofive = calc_user_performance(test_def, global_batch, exclude_batch)
-#print one_o_five_perf
-#print aveg_oofive
-
-#Implement as a loop
-#print users
-
 
 
