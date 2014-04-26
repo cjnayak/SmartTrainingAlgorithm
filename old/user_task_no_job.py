@@ -1,6 +1,9 @@
 import json
 import numpy as np
 import matplotlib.pyplot as plt
+from ddate_diff import tenure as tenure
+
+tenure("2013-01-22")
 
 
 def readData(json_file):
@@ -37,6 +40,8 @@ def readData(json_file):
 				users[uid]["batch"].setdefault(c_batchID, [])
 				users[uid]["batch"][c_batchID].append(corr)
 	return users, batch_score
+
+users, batch_score = readData('data/Getty_Gold.json')
 
 def calculate_avg_score_per_batch(batch_dict):
 	average_batch_score = {}
@@ -160,6 +165,8 @@ def gatingFrequencyAttenuatedContinous(user_past_score, current_batch_score, ave
 	number_of_questions_before_gold = base
 	number_of_questions_before_gold += number_of_questions_before_gold*reduction_rate*(user_past_score-past_threshold) + number_of_questions_before_gold*reduction_rate*(current_batch_score - current_threshold) + number_of_questions_before_gold*reduction_rate*(average_time_score - time_threshold)
 	return number_of_questions_before_gold	
+
+
 
 #print scores
 
