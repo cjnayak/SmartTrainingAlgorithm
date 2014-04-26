@@ -164,6 +164,7 @@ exclude_batch = 892
 #Testing it out on user 105
 one_o_five_perf, aveg_oofive = calc_user_performance(test_def, global_batch, exclude_batch)
 one_o_five_time, aveg_oofive2 = calc_user_performance(test_def2, global_time, exclude_batch)
+one_o_five_pref2, aveg_oofive2 = calc_user_performance(test_def, global_time, exclude_batch)
 #print one_o_five_perf
 #print aveg_oofive
 print one_o_five_time
