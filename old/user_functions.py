@@ -1,6 +1,7 @@
 import json
 import numpy as np
 import matplotlib.pyplot as plt
+from ddate_diff import tenure as tenure
 
 
 def readData(json_file):
@@ -45,8 +46,6 @@ def calculate_avg_score_per_batch(batch_dict):
 		average_batch_score[batch] = [float(sum(batch_dict[batch]))/float(len(batch_dict[batch])), np.std(batch_dict[batch]), float(len(batch_dict[batch]))]
 	return average_batch_score
 
-#run calculate_avg_score_per_batch on the global user scores
-global_batch = calculate_avg_score_per_batch(batch_score)
 
 #calucuates z score for each batch then averages them to generate an average performance metric
 def calc_user_performance(user_btch_avgs, global_batch_averages, exld):
@@ -64,47 +63,6 @@ def calc_user_performance(user_btch_avgs, global_batch_averages, exld):
 		len_z +=1
 	avg_z = tot_z/len(user_performance)
 	return user_performance, avg_z
-
-#test out calculate_avg_score_per_batch on user 105
-test_def = calculate_avg_score_per_batch(users[105]["batch"])
-
-#this is the test parameter for a particular batch/project we are looking at so we exclude it from their aggregate score
-exclude_batch = 892
-
-#Testing it out on user 105
-one_o_five_perf, aveg_oofive = calc_user_performance(test_def, global_batch, exclude_batch)
-#print one_o_five_perf
-#print aveg_oofive
-
-#Implement as a loop
-#print users
-
-scores = {}
-for user in users:
-	scores[user] = {}
-	scores[user]["batch"], scores[user]["av"] = calc_user_performance(users[user]["batch"], global_batch, exclude_batch)
-
-score_array = []
-outliers = []
-for score in scores:
-	score_array.append(scores[score]["av"])
-	if scores[score]["av"] > 3.0:
-		outliers.append(scores[score]["av"])
-	if scores[score]["av"] < -3.0:
-		outliers.append(scores[score]["av"])
-score_array.sort()
-print "Outliers:"
-print outliers
-
-
-plt.hist(score_array, 100)
-plt.ylabel('Frequency')
-plt.xlabel('Average Score Distribution')
-plt.title('Histogram of Performance Scores')
-#plt.plot(bins, y, 'r--')
-plt.show()
-
-
 
 #stepwise frequency gating
 def gatingFrequencyStepWise(user_past_score, current_batch_score, average_time_score, past_threshold, current_threshold, time_threshold, reduction_rate, base):
@@ -157,19 +115,66 @@ def gatingFrequencyAttenuatedContinous(user_past_score, current_batch_score, ave
 	number_of_questions_before_gold += number_of_questions_before_gold*reduction_rate*(user_past_score-past_threshold) + number_of_questions_before_gold*reduction_rate*(current_batch_score - current_threshold) + number_of_questions_before_gold*reduction_rate*(average_time_score - time_threshold)
 	return number_of_questions_before_gold	
 
-#print scores
 
 #test gating algorthim
-stw = gatingFrequencyStepWise(score_array[104], 0.25612226458999177, -0.4, 0, 0, 0, 0.9, 10 )
-stwpen = gatingFrequencyStepWisePenalty(score_array[104], 0.25612226458999177, -0.4, 0, 0, 0, 0.9, 10, 0.5 )
-atten = gatingFrequencyAttenuated(score_array[104], 0.25612226458999177, -0.4, 0, 0, 0, 0.9, 10 )
-attenCont = gatingFrequencyAttenuatedContinous(score_array[104], 0.25612226458999177, -0.4, 0, 0, 0, 0.9, 10 )
+if __name__ == "__main__":
+	tenure("2013-01-22")
+	users, batch_score = readData('data/Getty_Gold.json')
 
-print score_array[104]
-print stw
-print stwpen
-print atten
-print attenCont
+	#run calculate_avg_score_per_batch on the global user scores
+	global_batch = calculate_avg_score_per_batch(batch_score)
+
+	scores = {}
+	#this is the test parameter for a particular batch/project we are looking at so we exclude it from their aggregate score
+	exclude_batch = 892
+
+	for user in users:
+		scores[user] = {}
+		scores[user]["batch"], scores[user]["av"] = calc_user_performance(users[user]["batch"], global_batch, exclude_batch)
+
+	score_array = []
+	outliers = []
+	for score in scores:
+		score_array.append(scores[score]["av"])
+		if scores[score]["av"] > 3.0:
+			outliers.append(scores[score]["av"])
+		if scores[score]["av"] < -3.0:
+			outliers.append(scores[score]["av"])
+	score_array.sort()
+	print "Outliers:"
+	print outliers
+
+
+	plt.hist(score_array, 100)
+	plt.ylabel('Frequency')
+	plt.xlabel('Average Score Distribution')
+	plt.title('Histogram of Performance Scores')
+	#plt.plot(bins, y, 'r--')
+	plt.show()
+
+
+	stw = gatingFrequencyStepWise(score_array[104], 0.25612226458999177, -0.4, 0, 0, 0, 0.9, 10 )
+	stwpen = gatingFrequencyStepWisePenalty(score_array[104], 0.25612226458999177, -0.4, 0, 0, 0, 0.9, 10, 0.5 )
+	atten = gatingFrequencyAttenuated(score_array[104], 0.25612226458999177, -0.4, 0, 0, 0, 0.9, 10 )
+	attenCont = gatingFrequencyAttenuatedContinous(score_array[104], 0.25612226458999177, -0.4, 0, 0, 0, 0.9, 10 )
+
+	print score_array[104]
+	print stw
+	print stwpen
+	print atten
+	print attenCont
+
+###OLD CODE
+#test out calculate_avg_score_per_batch on user 105
+#test_def = calculate_avg_score_per_batch(users[105]["batch"])
+
+#Testing it out on user 105
+#one_o_five_perf, aveg_oofive = calc_user_performance(test_def, global_batch, exclude_batch)
+#print one_o_five_perf
+#print aveg_oofive
+
+#Implement as a loop
+#print users
 
 
 
