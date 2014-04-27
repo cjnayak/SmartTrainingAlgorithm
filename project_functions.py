@@ -17,11 +17,14 @@ def readData(json_file):
 			else:
 				corr = 0
 			uid = int(str(data[i]["users.id"]))
+			ten = tenure(data[i]["gold_metrics.answered_date"])
 			if uid not in users:
-				users[uid] = {"tasks": 0, "batch": {} }
-				
+				users[uid] = {"tasks": 0, "batch": {}, "tenure" : ten }	
 				#users[uid]["batch"].append(c_batchID)
 				#users[uid]["score"].append(corr)
+			else:
+				if ten > users[uid]["tenure"]:
+					users[uid]["tenure"] = ten
 			users[uid]["tasks"] += 1
 
 			if batchID in batch_score:
@@ -35,6 +38,9 @@ def readData(json_file):
 			else:
 				users[uid]["batch"].setdefault(c_batchID, [])
 				users[uid]["batch"][c_batchID].append(corr)
+
+
+
 	return users, batch_score
 
 def calculate_avg_score_per_batch(batch_dict):
@@ -53,7 +59,11 @@ def calc_user_performance(user_btch_avgs, global_batch_averages, exld):
 	 		if ubatch == project:
 		 		if project != exld:
 		 			#Calculate a z-score for the user's performance = (user's batch % - project avg)/std. for the project
-		 			user_performance[ubatch] = (user_btch_avgs[ubatch][0] - global_batch_averages[project][0])/global_batch_averages[project][1]
+		 			if global_batch_averages[project][1] == 0:
+		 				#Accounts for when there are uniform answers among all users for batch
+		 				user_performance[ubatch] = 0
+		 			else:
+		 				user_performance[ubatch] = (user_btch_avgs[ubatch][0] - global_batch_averages[project][0])/global_batch_averages[project][1]
 	tot_z = 0
 	len_z = 0
 	for b in user_performance:
