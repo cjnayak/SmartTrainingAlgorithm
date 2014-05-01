@@ -80,4 +80,5 @@ def tenure(rawDate):
 	task_date = datetime.date(y,m,d)
 	diff  = today - task_date
 	return diff.days
-	
+
+

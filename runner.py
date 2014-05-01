@@ -51,8 +51,6 @@ if __name__ == "__main__":
 	print pa.gatingFrequencyStepWisePenalty(score_array[104], 0.25612226458999177, -0.4, 0, 0, 0, 0.01, 10, 0.5)
 	print pa.gatingFrequencyAttenuated(*test_params)
 	print pa.gatingFrequencyAttenuatedContinous(*test_params)
-	
-	
 
 
 
