@@ -5,6 +5,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
+import csv, codecs, cStringIO
 
 users_test = [[-0.518539030945, 0.25612226458999177, -0.4],[0.618539030945, -0.25612226458999177, 0.2]]
 
@@ -54,6 +55,28 @@ def monty(users, numtimes, delta, base,thres_range, show_graph):
 		plt.show()
 	return curr_thres, past_thres, time_thres, gold_matrix, user_avg
 
-#monty(users_test, 100, .1, 200,[-.5, .5], True)
+cur_t, p_t, t_t, gold_m, u_avg = monty(users_test, 100, .1, 200,[-.5, .5], False)
+# with open('sim_matrix5.csv', 'w') as csvfile:
+# 	matwrite = csv.writer(csvfile,delimiter=',')
+# 	matwrite.writerow(["curr", "questions"])
+# 	for c in range(len(cur_t)):
+# 		for p in range(len(p_t)):
+# 			if p == 1: 
+# 				for t in range(len(t_t)):
+# 					if t == 1:
+# 						matwrite.writerow([cur_t[c] 	, u_avg[c,p,t]])
+# past = ""
+for t in range(len(t_t)):
+	with open('d3/s_m'+str(t)+'.csv', 'w') as csvfile:
+		matwrite = csv.writer(csvfile,delimiter=',')
+		for p in range(len(p_t)):
+			past += str(p_t[p])+","
+		matwrite.writerow(["curr", past])
+		for c in range(len(cur_t)):
+			pparam = ""
+			for p in range(len(p_t)):
+				pparam += str(u_avg[c,p,t]) +","
+			matwrite.writerow([cur_t[c], pparam])
+
 
 
