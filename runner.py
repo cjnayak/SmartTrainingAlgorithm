@@ -2,10 +2,11 @@ import matplotlib.pyplot as plt
 import scipy.stats as stats
 import project_functions as pf
 import project_algorthims as pa
+import monty
 
 #test gating algorthim
 if __name__ == "__main__":
-	users, batch_score = pf.readData('data/Getty_Training1.json')
+	users, batch_score, users_time, batch_time = pf.readData('data/Getty_Training1.json')
 
 	#run calculate_avg_score_per_batch on the global user scores
 	global_batch = pf.calculate_avg_score_per_batch(batch_score)
@@ -36,9 +37,18 @@ if __name__ == "__main__":
 	print "Outliers:"
 	print outliers
 
-	test_params = [score_array[10], 0.25612226458999177, -0.4, 0, 0, 0, 0.9, 10]
+	plt.hist(score_array, 100)
+	plt.ylabel('Frequency')
+	plt.xlabel('Average Score Distribution')
+	plt.title('Histogram of Performance Scores')
+	# #plt.plot(bins, y, 'r--')
+	plt.show()
+
+	
+	print score_array[10]
+	test_params = [score_array[10], 0.25612226458999177, -0.4, 0, 0, 0, 0.01, 200]
 	print pa.gatingFrequencyStepWise(*test_params)
-	print pa.gatingFrequencyStepWisePenalty(score_array[104], 0.25612226458999177, -0.4, 0, 0, 0, 0.9, 10, 0.5)
+	print pa.gatingFrequencyStepWisePenalty(score_array[104], 0.25612226458999177, -0.4, 0, 0, 0, 0.01, 10, 0.5)
 	print pa.gatingFrequencyAttenuated(*test_params)
 	print pa.gatingFrequencyAttenuatedContinous(*test_params)
 
