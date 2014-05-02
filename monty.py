@@ -66,17 +66,17 @@ cur_t, p_t, t_t, gold_m, u_avg = monty(users_test, 100, .1, 200,[-.5, .5], False
 # 					if t == 1:
 # 						matwrite.writerow([cur_t[c] 	, u_avg[c,p,t]])
 # past = ""
-for t in range(len(t_t)):
-	with open('d3/s_m'+str(t)+'.csv', 'w') as csvfile:
-		matwrite = csv.writer(csvfile,delimiter=',')
-		for p in range(len(p_t)):
-			past += str(p_t[p])+","
-		matwrite.writerow(["curr", past])
-		for c in range(len(cur_t)):
-			pparam = ""
-			for p in range(len(p_t)):
-				pparam += str(u_avg[c,p,t]) +","
-			matwrite.writerow([cur_t[c], pparam])
+# for t in range(len(t_t)):
+# 	with open('d3/s_m'+str(t)+'.csv', 'w') as csvfile:
+# 		matwrite = csv.writer(csvfile,delimiter=',')
+# 		for p in range(len(p_t)):
+# 			past += str(p_t[p])+","
+# 		matwrite.writerow(["curr", past])
+# 		for c in range(len(cur_t)):
+# 			pparam = ""
+# 			for p in range(len(p_t)):
+# 				pparam += str(u_avg[c,p,t]) +","
+# 			matwrite.writerow([cur_t[c], pparam])
 
 
 
