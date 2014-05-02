@@ -6,7 +6,7 @@ import monty
 
 #test gating algorthim
 if __name__ == "__main__":
-	users, batch_score = pf.readData('data/Getty_Training1.json')
+	users, batch_score, users_time, batch_time = pf.readData('data/Getty_Training1.json')
 
 	#run calculate_avg_score_per_batch on the global user scores
 	global_batch = pf.calculate_avg_score_per_batch(batch_score)
