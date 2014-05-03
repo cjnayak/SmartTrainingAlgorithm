@@ -6,7 +6,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 # data generation
 
-def cluster_svm(x_data, y_data, kmean, xlab, ylab):
+def cluster_svm(x_data, y_data, kmean, xlab, ylab, show_graph):
 	x =  vstack(x_data)
 	y = vstack(y_data)
 	#print data
@@ -22,14 +22,17 @@ def cluster_svm(x_data, y_data, kmean, xlab, ylab):
 	idx,_ = vq(dat,centroids)
 
 	# some plotting using numpy's logical indexing
-	plt.figure()
-	plt.plot(dat[idx==0,0],dat[idx==0,1],'ob',
-	      dat[idx==1,0],dat[idx==1,1],'or',
-	      dat[idx==2,0],dat[idx==2,1],'ok',)
-	plt.plot(centroids[:,0],centroids[:,1],'sg',markersize=8)
-	plt.xlabel(xlab)
-	plt.ylabel(ylab)
-	plt.show()
+	if show_graph:
+		plt.figure()
+		plt.plot(dat[idx==0,0],dat[idx==0,1],'ob',
+		      dat[idx==1,0],dat[idx==1,1],'or',
+		      dat[idx==2,0],dat[idx==2,1],'ok',)
+		plt.plot(centroids[:,0],centroids[:,1],'sg',markersize=8)
+		plt.xlabel(xlab)
+		plt.ylabel(ylab)
+		plt.show()
+
+
 # fig = plt.figure()
 # ax = fig.add_subplot(111, projection='3d')
 # ax.scatter(dat[idx==0,0],dat[idx==0,1], dat[idx==0,2], c='r', marker='o')
@@ -41,3 +44,4 @@ def cluster_svm(x_data, y_data, kmean, xlab, ylab):
 # for i in range(len(data_list)):
 # 	data.append(rand())	
 # cluster_svm(data_list, data, 3)
+

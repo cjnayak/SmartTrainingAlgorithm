@@ -64,11 +64,19 @@ def readData(json_file):
 
 	return users, batch_score, users_time, batch_time
 
+def batch_avg(batch):
+	return [float(sum(batch))/float(len(batch)), np.std(batch), float(len(batch))]
+
+#def curr_threshold(accuracy_thres, meanScore, stdDev):
+#	return (accuracy_thres - meanScore)
+def zscore(x, xbar, stDev):
+	return (x -xbar)/stDev
+
 def calculate_avg_score_per_batch(batch_dict):
 	average_batch_score = {}
 	# Calc average number, standard deviation of batch, number of jobs, 
 	for batch in batch_dict:
-		average_batch_score[batch] = [float(sum(batch_dict[batch]))/float(len(batch_dict[batch])), np.std(batch_dict[batch]), float(len(batch_dict[batch]))]
+		average_batch_score[batch] = batch_avg(batch_dict[batch])
 	return average_batch_score
 
 
@@ -83,8 +91,7 @@ def calc_user_performance(user_btch_avgs, global_batch_averages, exld):
 		 			if global_batch_averages[project][1] == 0:
 		 				#Accounts for when there are uniform answers among all users for batch
 		 				user_performance[ubatch] = 0
-		 			else:
-		 				user_performance[ubatch] = (user_btch_avgs[ubatch][0] - global_batch_averages[project][0])/global_batch_averages[project][1]
+		 			else:		 				user_performance[ubatch] = zscore(user_btch_avgs[ubatch][0], global_batch_averages[project][0], global_batch_averages[project][1])
 	tot_z = 0
 	len_z = 0
 	for b in user_performance:
@@ -92,6 +99,16 @@ def calc_user_performance(user_btch_avgs, global_batch_averages, exld):
 		len_z +=1
 	avg_z = tot_z/len(user_performance)
 	return user_performance, avg_z
+
+# def current_user_performance(user_averages, batch_avg, batch_len, batch_std):
+# 	for user in users:
+# 		u = {}
+# 		if global_batch_averages[project][1] == 0:
+# 		 #Accounts for when there are uniform answers among all users for batch
+# 		 	u[user]["z"] = 0
+# 		else:
+# 		 	u[user]["z"] = (user_btch_avgs[ubatch][0] - global_batch_averages[project][0])/global_batch_averages[project][1]
+
 
 def tenure(rawDate):
 	today = datetime.date.today()
