@@ -44,31 +44,31 @@ if __name__ == "__main__":
 	#score_array.sort()
 	print "Outliers:"
 	print outliers
-	print centroids
+	#print centroids
 
-	dist = {'low':[],'med-low':[],'med-high':[], 'high':[]}
-	for i in range(len(score_array)):
-		if score_array[i] < centroids[0,0]:
-			dist['low'].append(score_array[i])
-		elif score_array[i] < centroids[1,0]:
-			dist['med-low'].append(score_array[i])
-		elif score_array[i] < centroids[2,0]:
-			dist['med-high'].append(score_array[i])
-		elif score_array[i] > centroids[2,0]:
-			dist['high'].append(score_array[i])
-	for level in dist:
-		print level +':'+str(len(dist[level]))
+	# dist = {'low':[],'med-low':[],'med-high':[], 'high':[]}
+	# for i in range(len(score_array)):
+	# 	if score_array[i] < centroids[0,0]:
+	# 		dist['low'].append(score_array[i])
+	# 	elif score_array[i] < centroids[1,0]:
+	# 		dist['med-low'].append(score_array[i])
+	# 	elif score_array[i] < centroids[2,0]:
+	# 		dist['med-high'].append(score_array[i])
+	# 	elif score_array[i] > centroids[2,0]:
+	# 		dist['high'].append(score_array[i])
+	# for level in dist:
+	# 	print level +':'+str(len(dist[level]))
 
-	dist2= {'low':[], 'med':[], 'high':[]}
-	for i in range(len(score_array)):
-		if score_array[i] < centroids2[0,0]:
-			dist2['low'].append(score_array[i])
-		elif score_array[i] < centroids2[1,0]:
-			dist2['med'].append(score_array[i])
-		else:
-			dist2['high'].append(score_array[i])
-	for level in dist2:
-		print level +':'+str(len(dist2[level]))
+	# dist2= {'low':[], 'med':[], 'high':[]}
+	# for i in range(len(score_array)):
+	# 	if score_array[i] < centroids2[0,0]:
+	# 		dist2['low'].append(score_array[i])
+	# 	elif score_array[i] < centroids2[1,0]:
+	# 		dist2['med'].append(score_array[i])
+	# 	else:
+	# 		dist2['high'].append(score_array[i])
+	# for level in dist2:
+	# 	print level +':'+str(len(dist2[level]))
 	# plt.hist(time_array, 100)
 	# plt.ylabel('Frequency')
 	# plt.xlabel('Average Score Distribution')
@@ -90,9 +90,10 @@ if __name__ == "__main__":
 		questions[u,3] = pa.gatingFrequencyAttenuatedContinous(*test_params)
 		questions[u,4] = pa.centroidThresholdGating(score_array[u], curr_array[u], time_array[u], 0.97 , centroids, 0.1, 200)
 		questions[u,5] = pa.centroidThresholdGating(score_array[u], curr_array[u], time_array[u], 0.97 , centroids2, 0.1, 200)
-	#print questions[:,0]
-	#print questions[:,3]
+	print questions[:,5]
+	print questions[:,4]
 #questions.sort(axis=0)
+
 
 # plt.figure()
 # plt.plot(questions[:,0], label="Step Wise")
