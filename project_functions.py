@@ -100,6 +100,24 @@ def calc_user_performance(user_btch_avgs, global_batch_averages, exld):
 	avg_z = tot_z/len(user_performance)
 	return user_performance, avg_z
 
+def create_perf_arrays(userDict):
+	score_array = []
+	time_array = []
+	curr_array = []
+	users = []
+	outliers = []
+	for score in userDict:
+		users.append(score)
+		curr_array.append(userDict[score]["currentScore"][0])
+		score_array.append(userDict[score]["av"])
+		time_array.append(userDict[score]["t_av"])
+		if userDict[score]["av"] > 3.0:
+			outliers.append(userDict[score]["av"])
+		if userDict[score]["av"] < -3.0:
+			outliers.append(userDict[score]["av"])
+	perfMat = np.hstack([np.vstack(users), np.vstack(score_array), np.vstack(time_array), np.vstack(curr_array)])
+	return perfMat
+
 # def current_user_performance(user_averages, batch_avg, batch_len, batch_std):
 # 	for user in users:
 # 		u = {}
