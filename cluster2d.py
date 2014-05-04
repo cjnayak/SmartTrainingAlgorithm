@@ -31,6 +31,7 @@ def cluster_svm(x_data, y_data, kmean, xlab, ylab, show_graph):
 		plt.xlabel(xlab)
 		plt.ylabel(ylab)
 		plt.show()
+	return centroids
 
 
 # fig = plt.figure()
