@@ -106,7 +106,7 @@ def calc_user_performance(user_btch_avgs, global_batch_averages, exld):
 
 # Put the data in a format that weightRegressions can input
 def regressionDataPrep(global_time,global_batch, users, users_time):
-	observ = np.array(["Current","Time","Past","DC_Categorical", "batch"])
+	observ = np.array(["Current","Time","Past","DC_Categorical","batch"])
 	for batch in global_batch:
 		for user in users:
 			_, time = calc_user_performance(users_time[user]["batch"], global_time, "none")
@@ -116,7 +116,7 @@ def regressionDataPrep(global_time,global_batch, users, users_time):
 					newCurr = batch_avg(users[user]["batch"][batch])
 					current = newCurr[0]
 					_, past = calc_user_performance(users[user]["batch"], global_batch, batch)
-					observ = np.vstack([observ, [current, time, past, dc, batch]])
+					observ = np.vstack([observ,[current, time, past, dc, batch]])
 	return observ
 
 #Regress current accuracy on time and past performance to be used in the threshold algorthims 
