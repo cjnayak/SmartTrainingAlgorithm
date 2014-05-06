@@ -100,6 +100,12 @@ def calc_user_performance(user_btch_avgs, global_batch_averages, exld):
 	avg_z = tot_z/len(user_performance)
 	return user_performance, avg_z
 
+#Regress current accuracy on time and past performance to be used in the threshold algorthims 
+def weightRegressions(currAccur, times, otherScores):
+	betaTime = 1
+	betaScores = 1
+	return betaTime, betaScores
+
 def create_perf_arrays(userDict):
 	score_array = []
 	time_array = []
