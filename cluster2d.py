@@ -1,7 +1,7 @@
 from pylab import plot,show
 from numpy import vstack,hstack,array
 from numpy.random import rand
-from scipy.cluster.vq import kmeans,vq
+from scipy.cluster.vq import kmeans2,vq
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 # data generation
@@ -17,7 +17,7 @@ def cluster_svm(x_data, y_data, kmean, xlab, ylab, show_graph):
 	#print dat
 	#data = vstack((t,c, d))
 	# computing K-Means with K = 2 (2 clusters)
-	centroids,_ = kmeans(dat,kmean)
+	centroids,_ = kmeans2(dat,kmean, iter=20, minit='matrix')
 	# assign each sample to a cluster
 	idx,_ = vq(dat,centroids)
 

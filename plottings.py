@@ -71,6 +71,7 @@ def scatterOfClusterResults(paramX, paramY, colorArray, resultsMatrix, xlab, yla
 	at.set_xlabel(xlab)
 	at.set_ylabel(ylab)
 	at.set_zlabel(zlab)
+	at.set_title("3 Kmeans Clusters")
 	at.set_zlim(100, 300)
 	ax = fig.add_subplot(122, projection='3d')
 	sc2 = ax.scatter(paramX,paramY, resultsMatrix[:,5], c=colorArray, marker='o', s= 50)
@@ -78,6 +79,7 @@ def scatterOfClusterResults(paramX, paramY, colorArray, resultsMatrix, xlab, yla
 	ax.set_xlabel(xlab)
 	ax.set_ylabel(ylab)
 	ax.set_zlim(100, 300)
+	ax.set_title("2 Kmeans Clusters")
 	fig.colorbar(sc)
 	plt.show()
 

@@ -124,16 +124,6 @@ def create_perf_arrays(userDict):
 	perfMat = np.hstack([np.vstack(users), np.vstack(score_array), np.vstack(time_array), np.vstack(curr_array)])
 	return perfMat
 
-# def current_user_performance(user_averages, batch_avg, batch_len, batch_std):
-# 	for user in users:
-# 		u = {}
-# 		if global_batch_averages[project][1] == 0:
-# 		 #Accounts for when there are uniform answers among all users for batch
-# 		 	u[user]["z"] = 0
-# 		else:
-# 		 	u[user]["z"] = (user_btch_avgs[ubatch][0] - global_batch_averages[project][0])/global_batch_averages[project][1]
-
-
 def tenure(rawDate):
 	today = datetime.date.today()
 	y = int(rawDate[0:4])

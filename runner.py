@@ -15,7 +15,7 @@ if __name__ == "__main__":
 	global_time = pf.calculate_avg_score_per_batch(batch_time)
 	scores = {}
 	#this is the test parameter for a particular batch/project we are looking at so we exclude it from their aggregate score
-	current_batch = 903
+	current_batch = 892
 	user_ten = []
 	for user in users:
 		if current_batch in users[user]["batch"]:
@@ -32,23 +32,37 @@ if __name__ == "__main__":
 	#print perfMat
 
 	#Calculate Centroids
-	centroids = cluster(perfMat[:,1],perfMat[:,2], 3, "Past Score (Normalized)", "Average Time (Normalized)", False)
-	centroids2 = cluster(perfMat[:,1],perfMat[:,2], 2, "Past Score (Normalized)", "Average Time (Normalized)", False)
+	initial_centroids = np.array(([-0.25,0.25],[0,0],[0.75,0.5]))
+	initial_centroids2 = np.array(([-0.25,0.25],[0.25,0.5]))
+	centroids = cluster(perfMat[:,1],perfMat[:,2], initial_centroids, "Past Score (Normalized)", "Average Time (Normalized)", False)
+	centroids2 = cluster(perfMat[:,1],perfMat[:,2], initial_centroids2, "Past Score (Normalized)", "Average Time (Normalized)", False)
+	print "3 Cluster Centroids"
 	print centroids
+	print "2 Cluster Centroids"
 	print centroids2
 
 	#With Centroids as thresholds run each alogithm with the test parameters per users
 	questions = np.zeros((len(perfMat[:,1]),6))
-
+	base = 200
+	weights = {"Current":1}
+	weights["Time"], weights["Past"] = pf.weightRegressions(10,10,10)
 	for u in range(len(perfMat[:,1])):
-		test_params = [perfMat[u,1], perfMat[u,3], perfMat[u,2], centroids[1,0], .98, centroids[1,1], 1, 200]
-		questions[u,0] = pa.gatingFrequencyStepWise(*test_params)
-		questions[u,1] = pa.gatingFrequencyStepWisePenalty(perfMat[u,1], perfMat[u,3], perfMat[u,2], centroids[1,0], .98, centroids[1,1], 1, 200, 0.5)
-		questions[u,2] = pa.gatingFrequencyAttenuated(*test_params)
-		questions[u,3] = pa.gatingFrequencyAttenuatedContinous(*test_params)
-		questions[u,4] = pa.centroidThresholdGating(perfMat[u,1], perfMat[u,3], perfMat[u,2], 0.98 , centroids, 1, 200)
-		questions[u,5] = pa.centroidThresholdGating(perfMat[u,1], perfMat[u,3], perfMat[u,2], 0.98 , centroids2, 1, 200)
+		alg_params = [perfMat[u,1], perfMat[u,3], perfMat[u,2], .98, centroids, weights, base]
+		questions[u,0] = pa.StepWise(*alg_params)
+		questions[u,1] = pa.StepWisePenalty(perfMat[u,1], perfMat[u,3], perfMat[u,2], .98, centroids, weights, 200, 0.5)
+		questions[u,2] = pa.Attenuated(*alg_params)
+		questions[u,3] = pa.AttenuatedContinous(*alg_params)
+		questions[u,4] = pa.centroidThreshold(*alg_params)
+		questions[u,5] = pa.centroidThreshold(perfMat[u,1], perfMat[u,3], perfMat[u,2], .98, centroids2, weights, base)
 
+
+	print "simple change"
+	changeMatrix = questions - 200
+	print changeMatrix
+
+	average = np.mean(changeMatrix, axis=0)
+	print "Average Change in number of tasks before gold"
+	print average
 
 	#Plot the results of the algorthim
 	plottings.scatterOfClusterResults(perfMat[:,1], perfMat[:,2], perfMat[:,3], questions, 'Scores', 'Times', 'Questions before Gold')
