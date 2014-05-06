@@ -8,11 +8,13 @@ import plottings
 
 #test gating algorthim
 if __name__ == "__main__":
+	print "Reading Data..."
 	users, batch_score, users_time, batch_time = pf.readData('data/Getty_Training1.json')
 
 	#run calculate_avg_score_per_batch on the global user scores
 	global_batch = pf.calculate_avg_score_per_batch(batch_score)
 	global_time = pf.calculate_avg_score_per_batch(batch_time)
+
 	scores = {}
 	#this is the test parameter for a particular batch/project we are looking at so we exclude it from their aggregate score
 	current_batch = 892
@@ -26,6 +28,12 @@ if __name__ == "__main__":
 					scores[user]["currentScore"] = pf.batch_avg(users[user]["batch"][current_batch])
 					scores[user]["batch"], scores[user]["av"] = pf.calc_user_performance(users[user]["batch"], global_batch, current_batch)
 					scores[user]["t_batch"], scores[user]["t_av"] = pf.calc_user_performance(users_time[user]["batch"], global_time, current_batch)
+	
+	#Prep for creation of beta weights
+	print "Working on Beta weights..."
+	regressionData = pf.regressionDataPrep(global_time,global_batch, users, users_time)
+	print regressionData
+
 
 	#Create a matrix from Scores Dictionary that has UserID, Past Performance, Time Performance, and Current Score for each user
 	perfMat = pf.create_perf_arrays(scores)
@@ -45,7 +53,7 @@ if __name__ == "__main__":
 	questions = np.zeros((len(perfMat[:,1]),6))
 	base = 200
 	weights = {"Current":1}
-	weights["Time"], weights["Past"] = pf.weightRegressions(10,10,10)
+	weights["Time"], weights["Past"] = pf.weightRegressions(regressionData, 10, 10)
 	for u in range(len(perfMat[:,1])):
 		alg_params = [perfMat[u,1], perfMat[u,3], perfMat[u,2], .98, centroids, weights, base]
 		questions[u,0] = pa.StepWise(*alg_params)
@@ -65,7 +73,7 @@ if __name__ == "__main__":
 	print average
 
 	#Plot the results of the algorthim
-	plottings.scatterOfClusterResults(perfMat[:,1], perfMat[:,2], perfMat[:,3], questions, 'Scores', 'Times', 'Questions before Gold')
+	#plottings.scatterOfClusterResults(perfMat[:,1], perfMat[:,2], perfMat[:,3], questions, 'Scores', 'Times', 'Questions before Gold')
 
 
 

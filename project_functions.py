@@ -23,12 +23,12 @@ def readData(json_file):
 			duration = int(str(data[i]["gold_metrics.duration"]))
 			
 			if uid not in users:
-				users[uid] = {"tasks": 0, "batch": {}, "tenure" : ten }	
+				users[uid] = {"tasks": 0, "batch": {}, "tenure" : ten, "dc":  float(data[i]["delivery_centers.id"])}	
 				#users[uid]["batch"].append(c_batchID)
 				#users[uid]["score"].append(corr)
 			
 			if uid not in users_time:
-				users_time[uid] = {"tasks": 0, "batch": {}, "tenure" : ten }
+				users_time[uid] = {"tasks": 0, "batch": {}}
 				users_time[uid]["tasks"] += 1
 			
 			else:
@@ -91,14 +91,33 @@ def calc_user_performance(user_btch_avgs, global_batch_averages, exld):
 		 			if global_batch_averages[project][1] == 0:
 		 				#Accounts for when there are uniform answers among all users for batch
 		 				user_performance[ubatch] = 0
-		 			else:		 				user_performance[ubatch] = zscore(user_btch_avgs[ubatch][0], global_batch_averages[project][0], global_batch_averages[project][1])
+		 			else:		 				
+		 				user_performance[ubatch] = zscore(user_btch_avgs[ubatch][0], global_batch_averages[project][0], global_batch_averages[project][1])
 	tot_z = 0
 	len_z = 0
 	for b in user_performance:
 		tot_z += user_performance[b]
 		len_z +=1
-	avg_z = tot_z/len(user_performance)
+	if len(user_performance) > 0:
+		avg_z = tot_z/len(user_performance)
+	else:
+		avg_z = 0
 	return user_performance, avg_z
+
+# Put the data in a format that weightRegressions can input
+def regressionDataPrep(global_time,global_batch, users, users_time):
+	observ = np.array(["Current","Time","Past","DC_Categorical", "batch"])
+	for batch in global_batch:
+		for user in users:
+			_, time = calc_user_performance(users_time[user]["batch"], global_time, "none")
+			dc = users[user]["dc"]
+			for ubatch in users[user]["batch"]:
+				if ubatch == batch:
+					newCurr = batch_avg(users[user]["batch"][batch])
+					current = newCurr[0]
+					_, past = calc_user_performance(users[user]["batch"], global_batch, batch)
+					observ = np.vstack([observ, [current, time, past, dc, batch]])
+	return observ
 
 #Regress current accuracy on time and past performance to be used in the threshold algorthims 
 def weightRegressions(currAccur, times, otherScores):
@@ -132,5 +151,6 @@ def tenure(rawDate):
 	task_date = datetime.date(y,m,d)
 	diff  = today - task_date
 	return diff.days
+
 
 
