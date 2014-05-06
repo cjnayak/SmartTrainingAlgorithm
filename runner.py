@@ -1,8 +1,10 @@
 import matplotlib.pyplot as plt
-import scipy.stats as stats
 import project_functions as pf
 import project_algorthims as pa
 import monty
+from cluster2d import cluster_svm as cluster
+import numpy as np
+import plottings
 
 #test gating algorthim
 if __name__ == "__main__":
@@ -10,47 +12,49 @@ if __name__ == "__main__":
 
 	#run calculate_avg_score_per_batch on the global user scores
 	global_batch = pf.calculate_avg_score_per_batch(batch_score)
-
+	global_time = pf.calculate_avg_score_per_batch(batch_time)
 	scores = {}
 	#this is the test parameter for a particular batch/project we are looking at so we exclude it from their aggregate score
-	exclude_batch = 517
-
+	current_batch = 903
 	user_ten = []
 	for user in users:
-		if user != 368:
-			if user != 369:
-				user_ten.append(users[user]["tenure"])
-				scores[user] = {}
-				scores[user]["batch"], scores[user]["av"] = pf.calc_user_performance(users[user]["batch"], global_batch, exclude_batch)
+		if current_batch in users[user]["batch"]:
+			if user != 368:
+				if user != 369:
+					user_ten.append(users[user]["tenure"])
+					scores[user] = {}
+					scores[user]["currentScore"] = pf.batch_avg(users[user]["batch"][current_batch])
+					scores[user]["batch"], scores[user]["av"] = pf.calc_user_performance(users[user]["batch"], global_batch, current_batch)
+					scores[user]["t_batch"], scores[user]["t_av"] = pf.calc_user_performance(users_time[user]["batch"], global_time, current_batch)
 
-	score_array = []
-	outliers = []
-	for score in scores:
-		score_array.append(scores[score]["av"])
-		if scores[score]["av"] > 3.0:
-			outliers.append(scores[score]["av"])
-		if scores[score]["av"] < -3.0:
-			outliers.append(scores[score]["av"])
-			print score
+	#Create a matrix from Scores Dictionary that has UserID, Past Performance, Time Performance, and Current Score for each user
+	perfMat = pf.create_perf_arrays(scores)
+	#print perfMat
 
-	score_array.sort()
-	print "Outliers:"
-	print outliers
+	#Calculate Centroids
+	centroids = cluster(perfMat[:,1],perfMat[:,2], 3, "Past Score (Normalized)", "Average Time (Normalized)", False)
+	centroids2 = cluster(perfMat[:,1],perfMat[:,2], 2, "Past Score (Normalized)", "Average Time (Normalized)", False)
+	print centroids
+	print centroids2
 
-	plt.hist(score_array, 100)
-	plt.ylabel('Frequency')
-	plt.xlabel('Average Score Distribution')
-	plt.title('Histogram of Performance Scores')
-	# #plt.plot(bins, y, 'r--')
-	plt.show()
+	#With Centroids as thresholds run each alogithm with the test parameters per users
+	questions = np.zeros((len(perfMat[:,1]),6))
 
-	
-	print score_array[10]
-	test_params = [score_array[10], 0.25612226458999177, -0.4, 0, 0, 0, 0.01, 200]
-	print pa.gatingFrequencyStepWise(*test_params)
-	print pa.gatingFrequencyStepWisePenalty(score_array[104], 0.25612226458999177, -0.4, 0, 0, 0, 0.01, 10, 0.5)
-	print pa.gatingFrequencyAttenuated(*test_params)
-	print pa.gatingFrequencyAttenuatedContinous(*test_params)
+	for u in range(len(perfMat[:,1])):
+		test_params = [perfMat[u,1], perfMat[u,3], perfMat[u,2], centroids[1,0], .98, centroids[1,1], 1, 200]
+		questions[u,0] = pa.gatingFrequencyStepWise(*test_params)
+		questions[u,1] = pa.gatingFrequencyStepWisePenalty(perfMat[u,1], perfMat[u,3], perfMat[u,2], centroids[1,0], .98, centroids[1,1], 1, 200, 0.5)
+		questions[u,2] = pa.gatingFrequencyAttenuated(*test_params)
+		questions[u,3] = pa.gatingFrequencyAttenuatedContinous(*test_params)
+		questions[u,4] = pa.centroidThresholdGating(perfMat[u,1], perfMat[u,3], perfMat[u,2], 0.98 , centroids, 1, 200)
+		questions[u,5] = pa.centroidThresholdGating(perfMat[u,1], perfMat[u,3], perfMat[u,2], 0.98 , centroids2, 1, 200)
+
+
+	#Plot the results of the algorthim
+	plottings.scatterOfClusterResults(perfMat[:,1], perfMat[:,2], perfMat[:,3], questions, 'Scores', 'Times', 'Questions before Gold')
+
+
+
 
 
 
