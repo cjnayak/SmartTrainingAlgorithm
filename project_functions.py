@@ -106,32 +106,33 @@ def calc_user_performance(user_btch_avgs, global_batch_averages, exld):
 
 # Put the data in a format that weightRegressions can input
 def regressionDataPrep(global_time,global_batch, users, users_time):
-	observ = np.array(["Current","Time","Past","DC_Categorical", "batch"])
+	observ = np.array(["Current","Time","Past","DC_Categorical", "batch", "tenure"])
 	for batch in global_batch:
 		for user in users:
 			_, time = calc_user_performance(users_time[user]["batch"], global_time, "none")
 			dc = users[user]["dc"]
+			tenure = users[user]["tenure"]
 			for ubatch in users[user]["batch"]:
 				if ubatch == batch:
 					newCurr = batch_avg(users[user]["batch"][batch])
 					current = newCurr[0]
 					_, past = calc_user_performance(users[user]["batch"], global_batch, batch)
-					observ = np.vstack([observ, [current, time, past, dc, batch]])
+					observ = np.vstack([observ, [current, time, past, dc, batch, tenure]])
 	return observ
 
 #Regress current accuracy on time and past performance to be used in the threshold algorthims 
 def weightRegressions(regressionData):
 	#Generate Dummy Variables for each DC
-	uniques = np.unique(regressionData[:,4])
-	newDummies = np.zeros(len(regressionData), len(uniques))
-	for i in range(len(uniques)):
-		for j in range(len(regressionData)):
-			if regressionData[j,4] == i:
-				newDummies[j,i] = 1
+	# uniques = np.unique(regressionData[:,4])
+	# newDummies = np.zeros(len(regressionData), len(uniques))
+	# for i in range(len(uniques)):
+	# 	for j in range(len(regressionData)):
+	# 		if regressionData[j,4] == i:
+	# 			newDummies[j,i] = 1
 
 	#put in OLS and then set the betas here
-		betaTime = 1
-		betaScores = 1
+	betaTime = 1
+	betaScores = 1
 	return betaTime, betaScores
 
 def create_perf_arrays(userDict):

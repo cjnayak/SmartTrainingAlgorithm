@@ -65,6 +65,7 @@ def questionLine(resultsMatrix):
 
 def scatterOfClusterResults(paramX, paramY, colorArray, resultsMatrix, xlab, ylab, zlab):
 	fig = plt.figure()
+	fig.set_size_inches(18.5,10.5)
 	at = fig.add_subplot(121, projection='3d')
 	sc = at.scatter(paramX,paramY, resultsMatrix[:,4], c=colorArray, marker='o', s=50)
 	sc.set_clim(vmin=0.97,vmax=0.999)

@@ -32,16 +32,15 @@ if __name__ == "__main__":
 	#Prep for creation of beta weights
 	print "Working on Beta weights..."
 	regressionData = pf.regressionDataPrep(global_time,global_batch, users, users_time)
-	print regressionData
-	print regressionData[0:1,1:4]
+
 
 	#Create a matrix from Scores Dictionary that has UserID, Past Performance, Time Performance, and Current Score for each user
 	perfMat = pf.create_perf_arrays(scores)
 	#print perfMat
 
 	#Calculate Centroids
-	initial_centroids = np.array(([-0.25,0.25],[0,0],[0.75,0.5]))
-	initial_centroids2 = np.array(([-0.25,0.25],[0.25,0.5]))
+	initial_centroids = np.array(([-1,1],[0,0],[1,-1]))
+	initial_centroids2 = np.array(([-0.25,0.25],[0.25,-0.25]))
 	centroids = cluster(perfMat[:,1],perfMat[:,2], initial_centroids, "Past Score (Normalized)", "Average Time (Normalized)", False)
 	centroids2 = cluster(perfMat[:,1],perfMat[:,2], initial_centroids2, "Past Score (Normalized)", "Average Time (Normalized)", False)
 	print "3 Cluster Centroids"
@@ -72,7 +71,7 @@ if __name__ == "__main__":
 	print average
 
 	#Plot the results of the algorthim
-	#plottings.scatterOfClusterResults(perfMat[:,1], perfMat[:,2], perfMat[:,3], questions, 'Scores', 'Times', 'Questions before Gold')
+	plottings.scatterOfClusterResults(perfMat[:,1], perfMat[:,2], perfMat[:,3], questions, 'Scores', 'Times', 'Questions before Gold')
 
 
 
