@@ -123,17 +123,19 @@ def regressionDataPrep(global_time,global_batch, users, users_time):
 #Regress current accuracy on time and past performance to be used in the threshold algorthims 
 def weightRegressions(regressionData):
 	#Generate Dummy Variables for each DC
-	# uniques = np.unique(regressionData[:,4])
-	# newDummies = np.zeros(len(regressionData), len(uniques))
-	# for i in range(len(uniques)):
-	# 	for j in range(len(regressionData)):
-	# 		if regressionData[j,4] == i:
-	# 			newDummies[j,i] = 1
+	uniques = np.unique(regressionData[:,4])
+	newDummies = [np.zeros(len(regressionData)), len(uniques)]
+	for i in range(len(uniques)):
+		for j in range (len(regressionData)):
+			if regressionData[j,4] == i:
+				newDummies[j,i] = 1
+	regressionData = np.hstack([regressionData,newDummies])
+	
 
 	#put in OLS and then set the betas here
 	betaTime = 1
 	betaScores = 1
-	return betaTime, betaScores
+	return betaTime, betaScores, newDummies
 
 def create_perf_arrays(userDict):
 	score_array = []
