@@ -35,7 +35,11 @@ if __name__ == "__main__":
 	print "Working on Beta weights..."
 	regressionData = pf.regressionDataPrep(global_time,global_batch, users, users_time)
 	regressionDat = regressionData[1:,:].astype(np.float)
-
+	#regressionlog = np.log(regressionDat[1:,0])
+	
+	#m = ols.ols(regressionlog,regressionDat[1:,1:4],y_varnm ='Batch Score',x_varnm = ['Time','Past','DC'])
+	#m.summary()
+	
 	m = ols.ols(regressionDat[1:,0],regressionDat[1:,1:4],y_varnm ='Batch Score',x_varnm = ['Time','Past','DC'])
 	m.summary()
 	
