@@ -33,7 +33,7 @@ if __name__ == "__main__":
 	print "Working on Beta weights..."
 	regressionData = pf.regressionDataPrep(global_time,global_batch, users, users_time)
 	print regressionData
-
+	print regressionData[0:1,1:4]
 
 	#Create a matrix from Scores Dictionary that has UserID, Past Performance, Time Performance, and Current Score for each user
 	perfMat = pf.create_perf_arrays(scores)
@@ -53,7 +53,7 @@ if __name__ == "__main__":
 	questions = np.zeros((len(perfMat[:,1]),6))
 	base = 200
 	weights = {"Current":1}
-	weights["Time"], weights["Past"] = pf.weightRegressions(regressionData, 10, 10)
+	weights["Time"], weights["Past"] = pf.weightRegressions(regressionData)
 	for u in range(len(perfMat[:,1])):
 		alg_params = [perfMat[u,1], perfMat[u,3], perfMat[u,2], .98, centroids, weights, base]
 		questions[u,0] = pa.StepWise(*alg_params)
@@ -62,8 +62,7 @@ if __name__ == "__main__":
 		questions[u,3] = pa.AttenuatedContinous(*alg_params)
 		questions[u,4] = pa.centroidThreshold(*alg_params)
 		questions[u,5] = pa.centroidThreshold(perfMat[u,1], perfMat[u,3], perfMat[u,2], .98, centroids2, weights, base)
-
-
+	
 	print "simple change"
 	changeMatrix = questions - 200
 	print changeMatrix
