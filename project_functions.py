@@ -1,6 +1,7 @@
 import json
 import numpy as np
 import datetime
+import ols
 
 def readData(json_file):
 	with open(json_file) as data_file:    
@@ -129,10 +130,9 @@ def weightRegressions(regressionData):
 		for j in range (len(regressionData)):
 			if regressionData[j,4] == i:
 				newDummies[j,i] = 1
-	regressionData = np.hstack([regressionData,newDummies])
-	
-
-	#put in OLS and then set the betas here
+	regressionData = np.hstack((regressionData,newDummies))
+	regressionDat = regressionData[1:,:].astype(np.float)
+	m = ols.ols(regressionDat[1:,0],regressionDat[1:,1:],y_varnm ='Batch Score',x_varnm = ['Time','Past','DC'])
 	betaTime = 1
 	betaScores = 1
 	return betaTime, betaScores, newDummies

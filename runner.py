@@ -5,11 +5,12 @@ import monty
 from cluster2d import cluster_svm as cluster
 import numpy as np
 import plottings
+import ols
 
 #test gating algorthim
 if __name__ == "__main__":
 	print "Reading Data..."
-	users, batch_score, users_time, batch_time = pf.readData('data/Getty_Training1.json')
+	users, batch_score, users_time, batch_time = pf.readData('Getty_Training1.json')
 
 	#run calculate_avg_score_per_batch on the global user scores
 	global_batch = pf.calculate_avg_score_per_batch(batch_score)
@@ -32,8 +33,8 @@ if __name__ == "__main__":
 	#Prep for creation of beta weights
 	print "Working on Beta weights..."
 	regressionData = pf.regressionDataPrep(global_time,global_batch, users, users_time)
-	beta_time, beta_scores, dummies = pf.weightRegressions(regressionData)
-	
+	beta_time, beta_scores, dummies, m = pf.weightRegressions(regressionData)
+	m.summary()
 
 	#Create a matrix from Scores Dictionary that has UserID, Past Performance, Time Performance, and Current Score for each user
 	perfMat = pf.create_perf_arrays(scores)
