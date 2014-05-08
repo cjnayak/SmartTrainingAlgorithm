@@ -1,7 +1,6 @@
 import json
 import numpy as np
 import datetime
-import ols
 
 def readData(json_file):
 	with open(json_file) as data_file:    
@@ -133,10 +132,19 @@ def weightRegressions(regressionData):
 				newDummies[j,i] = 1
 	regressionData = np.hstack((regressionData,newDummies))
 	regressionDat = regressionData[1:,:].astype(np.float)
-	m = ols.ols(regressionDat[1:,0],regressionDat[1:,1:],y_varnm ='Batch Score',x_varnm = ['Time','Past','DC'])
-	betaTime = 1
-	betaScores = 1
-	return betaTime, betaScores, newDummies
+	timeX = np.transpose(regressionDat[:,1])
+	pastX = np.transpose(regressionDat[:,2])
+	tenX = np.transpose(regressionDat[:,5])
+	dc2 = np.transpose(regressionDat[:,6])
+	dc3 = np.transpose(regressionDat[:,7])
+	dc5 = np.transpose(regressionDat[:,8])
+	dc7 = np.transpose(regressionDat[:,9])
+	A = np.vstack([timeX, pastX, tenX, dc2, dc3, dc5, dc7, np.ones(len(timeX))]).T
+	y = np.transpose(regressionDat[:,0])
+	betas = np.linalg.lstsq(A, y)[0]
+	betaTime = betas[0]
+	betaScores = betas[1]
+	return betaTime, betaScores
 
 def create_perf_arrays(userDict):
 	score_array = []
@@ -164,6 +172,5 @@ def tenure(rawDate):
 	task_date = datetime.date(y,m,d)
 	diff  = today - task_date
 	return diff.days
-
 
 

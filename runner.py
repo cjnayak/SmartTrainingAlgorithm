@@ -30,7 +30,7 @@ if __name__ == "__main__":
 					scores[user]["t_batch"], scores[user]["t_av"] = pf.calc_user_performance(users_time[user]["batch"], global_time, current_batch)
 	
 	#Prep for creation of beta weights
-	print "Working on Beta weights..."
+	print "Working on prepping data for regression weights..."
 	regressionData = pf.regressionDataPrep(global_time,global_batch, users, users_time)
 
 
@@ -39,7 +39,7 @@ if __name__ == "__main__":
 	#print perfMat
 
 	#Calculate Centroids
-	initial_centroids = np.array(([-1,1],[0,0],[1,-1]))
+	initial_centroids = np.array(([-1,0.5],[0,0],[1,-0.5]))
 	initial_centroids2 = np.array(([-0.25,0.25],[0.25,-0.25]))
 	centroids = cluster(perfMat[:,1],perfMat[:,2], initial_centroids, "Past Score (Normalized)", "Average Time (Normalized)", False)
 	centroids2 = cluster(perfMat[:,1],perfMat[:,2], initial_centroids2, "Past Score (Normalized)", "Average Time (Normalized)", False)
@@ -53,6 +53,9 @@ if __name__ == "__main__":
 	base = 200
 	weights = {"Current":1}
 	weights["Time"], weights["Past"] = pf.weightRegressions(regressionData)
+	print "Algorthim weights:"
+	print "Time Weight:" + str(weights["Time"])
+	print "Past Score Weight:" + str(weights["Past"])
 	for u in range(len(perfMat[:,1])):
 		alg_params = [perfMat[u,1], perfMat[u,3], perfMat[u,2], .98, centroids, weights, base]
 		questions[u,0] = pa.StepWise(*alg_params)
