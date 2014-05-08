@@ -65,7 +65,8 @@ def questionLine(resultsMatrix):
 
 def scatterOfClusterResults(paramX, paramY, colorArray, resultsMatrix, xlab, ylab, zlab):
 	fig = plt.figure()
-	fig.set_size_inches(8,6)
+	fig.set_size_inches(9,5)
+	fig.patch.set_facecolor('white')
 	at = fig.add_subplot(121, projection='3d')
 	sc = at.scatter(paramX,paramY, resultsMatrix[:,4], c=colorArray, marker='o', s=50)
 	sc.set_clim(vmin=0.97,vmax=0.999)
@@ -73,14 +74,15 @@ def scatterOfClusterResults(paramX, paramY, colorArray, resultsMatrix, xlab, yla
 	at.set_ylabel(ylab)
 	at.set_zlabel(zlab)
 	at.set_title("3 Kmeans Clusters")
-	at.set_zlim(100, 300)
+	at.set_zlim(0, 400)
 	ax = fig.add_subplot(122, projection='3d')
 	sc2 = ax.scatter(paramX,paramY, resultsMatrix[:,5], c=colorArray, marker='o', s= 50)
 	sc2.set_clim(vmin=0.97,vmax=0.999)
 	ax.set_xlabel(xlab)
 	ax.set_ylabel(ylab)
-	ax.set_zlim(100, 300)
+	ax.set_zlim(0, 400)
 	ax.set_title("2 Kmeans Clusters")
+	fig.subplots_adjust(right=0.8)
 	fig.colorbar(sc)
 	plt.show()
 

@@ -122,9 +122,9 @@ def regressionDataPrep(global_time,global_batch, users, users_time):
 
 #Regress current accuracy on time and past performance to be used in the threshold algorthims 
 def weightRegressions(regressionData):
+	print "Calculating regression weights..."
 	#Generate Dummy Variables for each DC
 	uniques = np.unique(regressionData[1:,3])
-	print uniques
 	newDummies = np.zeros((len(regressionData[:,3]),len(uniques)))
 	for i in range(len(uniques)):
 		for j in range (len(regressionData)):
@@ -173,4 +173,12 @@ def tenure(rawDate):
 	diff  = today - task_date
 	return diff.days
 
+def chooseBatch(batches):
+	mxBatchlen = 0
+	mxBatch = 0
+	for batch in batches:
+		if len(batches[batch]) > mxBatchlen:
+			mxBatch = batch
+			mxBatchlen = len(batches[batch])
+	return mxBatch
 

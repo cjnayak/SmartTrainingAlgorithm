@@ -15,9 +15,12 @@ if __name__ == "__main__":
 	global_batch = pf.calculate_avg_score_per_batch(batch_score)
 	global_time = pf.calculate_avg_score_per_batch(batch_time)
 
+	mxBatch = pf.chooseBatch(batch_score)
+
 	scores = {}
 	#this is the test parameter for a particular batch/project we are looking at so we exclude it from their aggregate score
-	current_batch = 892
+	current_batch = mxBatch
+	print '\033[1m' + "Current Batch: " +str(current_batch) + '\033[0m'
 	user_ten = []
 	for user in users:
 		if current_batch in users[user]["batch"]:
@@ -39,10 +42,12 @@ if __name__ == "__main__":
 	#print perfMat
 
 	#Calculate Centroids
-	initial_centroids = np.array(([-1,0.5],[0,0],[1,-0.5]))
-	initial_centroids2 = np.array(([-0.25,0.25],[0.25,-0.25]))
-	centroids = cluster(perfMat[:,1],perfMat[:,2], initial_centroids, "Past Score (Normalized)", "Average Time (Normalized)", False)
-	centroids2 = cluster(perfMat[:,1],perfMat[:,2], initial_centroids2, "Past Score (Normalized)", "Average Time (Normalized)", False)
+	#initial_centroids = np.array(([-0.5,0.5],[0,0],[0.5,-0.5]))
+	#initial_centroids2 = np.array(([-0.25,0.25],[0.25,-0.25]))
+	centroids = cluster(perfMat[:,1],perfMat[:,2], 3, "Past Score (Normalized)", "Average Time (Normalized)", False)
+	centroids2 = cluster(perfMat[:,1],perfMat[:,2], 2, "Past Score (Normalized)", "Average Time (Normalized)", False)
+	print ""
+	print '\033[1m' + "Centroid Cutoffs" '\033[0m'
 	print "3 Cluster Centroids"
 	print centroids
 	print "2 Cluster Centroids"
@@ -53,7 +58,8 @@ if __name__ == "__main__":
 	base = 200
 	weights = {"Current":1}
 	weights["Time"], weights["Past"] = pf.weightRegressions(regressionData)
-	print "Algorthim weights:"
+	print " "
+	print '\033[1m' + "Algorthim weights:" + '\033[0m'
 	print "Time Weight:" + str(weights["Time"])
 	print "Past Score Weight:" + str(weights["Past"])
 	for u in range(len(perfMat[:,1])):
@@ -65,12 +71,16 @@ if __name__ == "__main__":
 		questions[u,4] = pa.centroidThreshold(*alg_params)
 		questions[u,5] = pa.centroidThreshold(perfMat[u,1], perfMat[u,3], perfMat[u,2], .98, centroids2, weights, base)
 	
-	print "simple change"
+	print " "
+	print '\033[1m' + "How many questions have been added or subtracted"+ '\033[0m'
+	print "StepWise StepWisePenalty Attenuated AttenuatedContinous 2Cluster 3Cluster"
 	changeMatrix = questions - 200
 	print changeMatrix
 
 	average = np.mean(changeMatrix, axis=0)
-	print "Average Change in number of tasks before gold"
+	print " "
+	print '\033[1m' + "Average Change in number of tasks before gold" + '\033[0m'
+	print "StepWise StepWisePenalty Attenuated AttenuatedContinous 2Cluster 3Cluster"
 	print average
 
 	#Plot the results of the algorthim

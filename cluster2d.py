@@ -17,7 +17,7 @@ def cluster_svm(x_data, y_data, kmean, xlab, ylab, show_graph):
 	#print dat
 	#data = vstack((t,c, d))
 	# computing K-Means with K = 2 (2 clusters)
-	centroids,_ = kmeans2(dat,kmean, iter=20, minit='matrix')
+	centroids,_ = kmeans2(dat,kmean, iter=20)
 	# assign each sample to a cluster
 	idx,_ = vq(dat,centroids)
 
