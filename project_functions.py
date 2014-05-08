@@ -1,6 +1,7 @@
 import json
 import numpy as np
 import datetime
+import ols
 
 def readData(json_file):
 	with open(json_file) as data_file:    
@@ -123,17 +124,19 @@ def regressionDataPrep(global_time,global_batch, users, users_time):
 #Regress current accuracy on time and past performance to be used in the threshold algorthims 
 def weightRegressions(regressionData):
 	#Generate Dummy Variables for each DC
-	# uniques = np.unique(regressionData[:,4])
-	# newDummies = np.zeros(len(regressionData), len(uniques))
-	# for i in range(len(uniques)):
-	# 	for j in range(len(regressionData)):
-	# 		if regressionData[j,4] == i:
-	# 			newDummies[j,i] = 1
-
-	#put in OLS and then set the betas here
+	uniques = np.unique(regressionData[1:,3])
+	print uniques
+	newDummies = np.zeros((len(regressionData[:,3]),len(uniques)))
+	for i in range(len(uniques)):
+		for j in range (len(regressionData)):
+			if regressionData[j,4] == i:
+				newDummies[j,i] = 1
+	regressionData = np.hstack((regressionData,newDummies))
+	regressionDat = regressionData[1:,:].astype(np.float)
+	m = ols.ols(regressionDat[1:,0],regressionDat[1:,1:],y_varnm ='Batch Score',x_varnm = ['Time','Past','DC'])
 	betaTime = 1
 	betaScores = 1
-	return betaTime, betaScores
+	return betaTime, betaScores, newDummies
 
 def create_perf_arrays(userDict):
 	score_array = []
