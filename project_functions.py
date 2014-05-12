@@ -246,5 +246,9 @@ def secondRound(last_score, current_score, new_base, cent3, cent2, betas, questi
 		secondRoundOutput[u,2] = pa.centroidThreshold(*alg_params)
 		secondRoundOutput[u,3] = pa.centroidThreshold(current_score[u], perfMat[u,3], perfMat[u,2], .98, centroids2, betas, new_base[u])
 	#Adjust for Questions cap
+	#If the output gets below a certain threshold we put in a floor
+	#If the output gets above a certain threshold we put in a ceiling
+	secondRoundOutput[secondRoundOutput<questions_cap[0]] += questions_cap[0]
+	secondRoundOutput[secondRoundOutput>questions_cap[1]] += questions_cap[1]
 	return secondRoundOutput
 
