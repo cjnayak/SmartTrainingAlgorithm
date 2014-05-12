@@ -56,28 +56,4 @@ def monty(users, numtimes, deltas, base,thres_range, show_graph):
 		plt.show()
 	return curr_thres, past_thres, time_thres, gold_matrix, user_avg
 
-#cur_t, p_t, t_t, gold_m, u_avg = monty(users_test, 100, {"Time":1, "Current": 1, "Past": 1}, 200,[-.5, .5], False)
-# with open('sim_matrix5.csv', 'w') as csvfile:
-# 	matwrite = csv.writer(csvfile,delimiter=',')
-# 	matwrite.writerow(["curr", "questions"])
-# 	for c in range(len(cur_t)):
-# 		for p in range(len(p_t)):
-# 			if p == 1: 
-# 				for t in range(len(t_t)):
-# 					if t == 1:
-# 						matwrite.writerow([cur_t[c] 	, u_avg[c,p,t]])
-# past = ""
-# for t in range(len(t_t)):
-# 	with open('d3/s_m'+str(t)+'.csv', 'w') as csvfile:
-# 		matwrite = csv.writer(csvfile,delimiter=',')
-# 		for p in range(len(p_t)):
-# 			past += str(p_t[p])+","
-# 		matwrite.writerow(["curr", past])
-# 		for c in range(len(cur_t)):
-# 			pparam = ""
-# 			for p in range(len(p_t)):
-# 				pparam += str(u_avg[c,p,t]) +","
-# 			matwrite.writerow([cur_t[c], pparam])
-
-
 
