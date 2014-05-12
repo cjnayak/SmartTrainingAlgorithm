@@ -163,11 +163,10 @@ def weightRegressions(regressionData):
 	betaTime = betas[0]
 	betaScores = betas[1]
 	rSquared = (1 -linReg[1])/(y.size * y.var())
-	print "rSquared"
-	print rSquared
+	print "rSquared with Tenuee:" + str(rSquared)
 	B = np.vstack([timeX, np.ones(len(timeX))]).T
 	rSquared2 = (1 - np.linalg.lstsq(B, y)[1])/(y.size * y.var())
-	print rSquared2
+	print "rSquared without  Tenure:" + str(rSquared2)
 
 	#Run through each user and develop a category for them:
 	# 0: Bad user based off of current accuracy
