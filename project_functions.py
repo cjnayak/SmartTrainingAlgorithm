@@ -1,6 +1,7 @@
 import json
 import numpy as np
 import datetime
+from sklearn.naive_bayes import GaussianNB
 
 def readData(json_file):
 	with open(json_file) as data_file:    
@@ -9,6 +10,7 @@ def readData(json_file):
 	batch_score = {}
 	users_time = {}
 	batch_time = {}
+
 	for i in range(len(data)):
 		#exclude Sama Source HQ tests
 		if data[i]["delivery_centers.id"] != "1":
@@ -99,10 +101,25 @@ def calc_user_performance(user_btch_avgs, global_batch_averages, exld):
 		tot_z += user_performance[b]
 		len_z +=1
 	if len(user_performance) > 0:
-		avg_z = tot_z/len(user_performance)
+		avg_z = round(tot_z/len(user_performance),9)
 	else:
 		avg_z = 0
 	return user_performance, avg_z
+
+#Run a loop to take global and batch averages into a functional user dictionary
+def scoresLoop(users, users_time, current_batch, global_batch_scores, global_batch_time):
+	scores = {}
+	user_tenure = []
+	for user in users:
+		if current_batch in users[user]["batch"]:
+			if user != 368:
+				if user != 369:
+					user_tenure.append(users[user]["tenure"])
+					scores[user] = {}
+					scores[user]["currentScore"] = batch_avg(users[user]["batch"][current_batch])
+					scores[user]["batch"], scores[user]["av"] = calc_user_performance(users[user]["batch"], global_batch_scores, current_batch)
+					scores[user]["t_batch"], scores[user]["t_av"] = calc_user_performance(users_time[user]["batch"], global_batch_time, current_batch)
+	return scores, user_tenure
 
 # Put the data in a format that weightRegressions can input
 def regressionDataPrep(global_time,global_batch, users, users_time):
@@ -135,15 +152,42 @@ def weightRegressions(regressionData):
 	timeX = np.transpose(regressionDat[:,1])
 	pastX = np.transpose(regressionDat[:,2])
 	tenX = np.transpose(regressionDat[:,5])
-	dc2 = np.transpose(regressionDat[:,6])
-	dc3 = np.transpose(regressionDat[:,7])
-	dc5 = np.transpose(regressionDat[:,8])
-	dc7 = np.transpose(regressionDat[:,9])
-	A = np.vstack([timeX, pastX, tenX, dc2, dc3, dc5, dc7, np.ones(len(timeX))]).T
+	#dc2 = np.transpose(regressionDat[:,6])
+	#dc3 = np.transpose(regressionDat[:,7])
+	#dc5 = np.transpose(regressionDat[:,8])
+	#dc7 = np.transpose(regressionDat[:,9])
+	A = np.vstack([timeX, pastX, tenX, np.ones(len(timeX))]).T
 	y = np.transpose(regressionDat[:,0])
-	betas = np.linalg.lstsq(A, y)[0]
+	linReg = np.linalg.lstsq(A, y)
+	betas = linReg[0]
 	betaTime = betas[0]
 	betaScores = betas[1]
+	rSquared = (1 -linReg[1])/(y.size * y.var())
+	print "rSquared"
+	print rSquared
+	B = np.vstack([timeX, np.ones(len(timeX))]).T
+	rSquared2 = (1 - np.linalg.lstsq(B, y)[1])/(y.size * y.var())
+	print rSquared2
+
+	#Run through each user and develop a category for them:
+	# 0: Bad user based off of current accuracy
+	# 1: Average performance users
+	# 2: High performance on score
+	userCat = []
+	for i in range(len(regressionDat[:,1])):
+		if regressionDat[i,1] < .95:
+			userCat.append(0)
+		elif regressionDat[i,1] < .98:
+			userCat.append(1)
+		else:
+			userCat.append(2)
+	#run Naive Bayes on Past Performance and Time
+	gnb = GaussianNB()
+	y_pred = gnb.fit(regressionDat[:,1:3], userCat).predict(regressionDat[:,1:3])
+	precision = 1.0 - float((userCat != y_pred).sum())/float(len(userCat))
+	print precision
+
+
 	return betaTime, betaScores
 
 def create_perf_arrays(userDict):
@@ -181,4 +225,7 @@ def chooseBatch(batches):
 			mxBatch = batch
 			mxBatchlen = len(batches[batch])
 	return mxBatch
+
+def secondRound(last_score, new_base, current_score, questions_cap):
+	return questionsbeforeGold
 
