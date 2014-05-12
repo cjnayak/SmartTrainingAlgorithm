@@ -23,11 +23,12 @@ if __name__ == "__main__":
 
 	#this is the test parameter for a particular batch/project we are looking at so we exclude it from their aggregate score
 	#this will default to the largest batch in the file, but can be set at the command line by using the word batch and then putting the batch number
-	if sys_arguments[2] == "batch":
-		mxBatch = int(sys_arguments[3])
-		if mxBatch not in global_batch:
-			print "there are no tasks in this batch, reverting to longest batch"
-			mxBatch = pf.chooseBatch(batch_score)
+	if len(sys_arguments) > 2:
+		if sys_arguments[2] == "batch":
+			mxBatch = int(sys_arguments[3])
+			if mxBatch not in global_batch:
+				print "there are no tasks in this batch, reverting to longest batch"
+				mxBatch = pf.chooseBatch(batch_score)
 	else:
 		mxBatch = pf.chooseBatch(batch_score)
 	print '\033[1m' + "Current Batch: " +str(mxBatch) + '\033[0m'

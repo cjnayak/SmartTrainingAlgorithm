@@ -163,10 +163,11 @@ def weightRegressions(regressionData):
 	betaTime = betas[0]
 	betaScores = betas[1]
 	rSquared = (1 -linReg[1])/(y.size * y.var())
-	print "rSquared with Tenuee:" + str(rSquared)
+	print " "
+	print "rSquared with Tenure: " + str(rSquared)
 	B = np.vstack([timeX, np.ones(len(timeX))]).T
 	rSquared2 = (1 - np.linalg.lstsq(B, y)[1])/(y.size * y.var())
-	print "rSquared without  Tenure:" + str(rSquared2)
+	print "rSquared without  Tenure: " + str(rSquared2)
 
 	#Run through each user and develop a category for them:
 	# 0: Bad user based off of current accuracy
@@ -184,7 +185,7 @@ def weightRegressions(regressionData):
 	gnb = GaussianNB()
 	y_pred = gnb.fit(regressionDat[:,1:3], userCat).predict(regressionDat[:,1:3])
 	precision = 1.0 - float((userCat != y_pred).sum())/float(len(userCat))
-	print precision
+	print "Naive Bayese Precision of being a good, bad or average user:" +str(round(precision,2)) + "%"
 
 
 	return betaTime, betaScores
