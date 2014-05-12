@@ -25,6 +25,9 @@ if __name__ == "__main__":
 	#this will default to the largest batch in the file, but can be set at the command line by using the word batch and then putting the batch number
 	if sys_arguments[2] == "batch":
 		mxBatch = int(sys_arguments[3])
+		if mxBatch not in global_batch:
+			print "there are no tasks in this batch, reverting to longest batch"
+			mxBatch = pf.chooseBatch(batch_score)
 	else:
 		mxBatch = pf.chooseBatch(batch_score)
 	print '\033[1m' + "Current Batch: " +str(mxBatch) + '\033[0m'
@@ -84,13 +87,13 @@ if __name__ == "__main__":
 	print average
 
 	#Plot the results of the algorthim
+	#plottings.score_centroid_distributions(perfMat[:,1], centroids, centroids2)
+	#plottings.tenure_to_performance_plot(perfMat[:,1],user_ten, "Tenure", "Scores")
 	plottings.scatterOfClusterResults(perfMat[:,1], perfMat[:,2], perfMat[:,3], questions, 'Scores', 'Times', 'Questions before Gold')
 
 	## For a given project, once implemented the file would run the following function after the 
-	questionsCap = [50, 400]
-	secondRoundOutput = np.zeros((len(perfMat[:,1]),2))
-	for u in range(len(perfMat[:,1])):
-		secondRoundOutput[u,0],secondRoundOutput[u,1]= pf.secondRound(perfMat[:,1], newScores, questions[u,4:], centroids, centroids2, weights)
+	#questionsCap = [50, 400]
+	#secondRoundOutput = pf.secondRound(perfMat[:,1], newScores, questions[:,4:], centroids, centroids2, weights, questionsCap, perfMat)
 
 
 

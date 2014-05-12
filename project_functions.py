@@ -226,6 +226,25 @@ def chooseBatch(batches):
 			mxBatchlen = len(batches[batch])
 	return mxBatch
 
-def secondRound(last_score, new_base, current_score, questions_cap):
-	return questionsbeforeGold
+def secondRound(last_score, current_score, new_base, cent3, cent2, betas, questions_cap, old_perf):
+	secondRoundOutput = np.zeros((len(perfMat[:,1]),4))
+	newRegXY = np.array(["change", "questions"])
+	for i in len(last_score):
+		secondRoundOutput[i,0] = current_score - last_score
+		# If last score was perfect, keep weight at 1
+		if last_score == 1.0:
+			secondRoundOutput[i,1] = 1
+		else:
+			newRegXY = np.vstack([newRegXY, [current_score - last_score, new_base[i]]])
+	X = np.transpose(newRegXY[:,0])
+	A = np.vstack([X, np.ones(len(X))]).T
+	Y = np.transpose(newRegXY[:,1])
+	newWeight = np.linalg.lstsq(A, Y)[0][0]
+	betas["Current"] = newWeight
+	for u in range(len(secondRoundOutput[:,1])):
+		#Attenuated Cluster Algorthims of Interest
+		secondRoundOutput[u,2] = pa.centroidThreshold(*alg_params)
+		secondRoundOutput[u,3] = pa.centroidThreshold(current_score[u], perfMat[u,3], perfMat[u,2], .98, centroids2, betas, new_base[u])
+	#Adjust for Questions cap
+	return secondRoundOutput
 

@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import scipy.stats as stats
+from numpy import polyfit, poly1d
 
 def plot_hist(array, ylab, xlab, titl, bins):
 	plt.hist(array, bins)
@@ -14,6 +15,13 @@ def tenure_to_performance_plot(scores,tenure, xlab, ylab):
 	print slope
 	print r_value
 	plt.scatter(tenure,scores)
+	fit=polyfit(tenure,scores,1)
+	#slope, fit_fn=pl.poly1d(fit)
+	fit_fn=poly1d(fit)
+	plt.plot(tenure,fit_fn(tenure), '-b' )
+	plt.ylabel(ylab)
+	plt.xlabel(xlab)
+	plt.title("Scatter of Tenure to Performance for Current Batch")
 	plt.show()
 
 def score_centroid_distributions(array, cent3, cent2):
