@@ -9,41 +9,51 @@ import plottings
 
 #test gating algorthim
 if __name__ == "__main__":
+
+	print "Reading Data..."
+	sys_arguments = sys.argv
+	users, batch_score, users_time, batch_time = pf.readData(sys_arguments[1])
+
+	#run calculate_avg_score_per_batch on the global user scores
+	global_batch = pf.calculate_avg_score_per_batch(batch_score)
+	global_time = pf.calculate_avg_score_per_batch(batch_time)
+
+	#Prep for creation of beta weights
+	print "Working on prepping data for regression weights..."
+	regressionData = pf.regressionDataPrep(global_time,global_batch, users, users_time)
+
+	#this is the test parameter for a particular batch/project we are looking at so we exclude it from their aggregate score
+	#It will default to the largest batch in the file, but can be set at the command line by using the word batch and then putting the batch number
+	if len(sys_arguments) > 2:
+		if sys_arguments[2] == "batch":
+			mxBatch = int(sys_arguments[3])
+			if mxBatch not in global_batch:
+				print "there are no tasks in this batch, reverting to longest batch"
+				mxBatch = pf.chooseBatch(batch_score)
+		else:
+			mxBatch = pf.chooseBatch(batch_score)
+	else:
+		mxBatch = pf.chooseBatch(batch_score)
+	print '\033[1m' + "Current Batch: " +str(mxBatch) + '\033[0m'
+	
+	#Create a user dictionary based of of individual users and global scores
+	scores, user_ten = pf.scoresLoop(users, users_time, mxBatch, global_batch, global_time)
+
+	#Create a matrix from Scores Dictionary that has UserID, Past Performance, Time Performance, and Current Score for each user
+	perfMat = pf.create_perf_arrays(scores)
+
+	### Allow for parameter to loop through to calculate average profit function
 	averagesum_2 = 0
 	averagesum_3 = 0	
 	profit_sum2 = 0
-	profit_sum3 = 0 
-	for i in xrange(30):
-		print "Reading Data..."
-		sys_arguments = sys.argv
-		users, batch_score, users_time, batch_time = pf.readData(sys_arguments[1])
-
-		#run calculate_avg_score_per_batch on the global user scores
-		global_batch = pf.calculate_avg_score_per_batch(batch_score)
-		global_time = pf.calculate_avg_score_per_batch(batch_time)
-
-		#Prep for creation of beta weights
-		print "Working on prepping data for regression weights..."
-		regressionData = pf.regressionDataPrep(global_time,global_batch, users, users_time)
-
-		#this is the test parameter for a particular batch/project we are looking at so we exclude it from their aggregate score
-		#this will default to the largest batch in the file, but can be set at the command line by using the word batch and then putting the batch number
-		if len(sys_arguments) > 2:
-			if sys_arguments[2] == "batch":
-				mxBatch = int(sys_arguments[3])
-				if mxBatch not in global_batch:
-					print "there are no tasks in this batch, reverting to longest batch"
-					mxBatch = pf.chooseBatch(batch_score)
-		else:
-			mxBatch = pf.chooseBatch(batch_score)
-		print '\033[1m' + "Current Batch: " +str(mxBatch) + '\033[0m'
-		
-		#Create a user dictionary based of of individual users and global scores
-		scores, user_ten = pf.scoresLoop(users, users_time, mxBatch, global_batch, global_time)
-
-		#Create a matrix from Scores Dictionary that has UserID, Past Performance, Time Performance, and Current Score for each user
-		perfMat = pf.create_perf_arrays(scores)
-
+	profit_sum3 = 0
+	if "run-loop" in sys_arguments:
+		run = 30
+		loop = True
+	else:
+		run = 1
+		loop = False
+	for i in xrange(run):
 		#Calculate Centroids
 		#initial_centroids = np.array(([-0.5,0.5],[0,0],[0.5,-0.5]))
 		#initial_centroids2 = np.array(([-0.25,0.25],[0.25,-0.25]))
@@ -118,30 +128,33 @@ if __name__ == "__main__":
 		print "StepWise StepWisePenalty Attenuated AttenuatedContinous 2Cluster 3Cluster"
 		print average
 
-		#Plot the results of the algorthim
-		#plottings.score_centroid_distributions(perfMat[:,1], centroids, centroids2)
-		#plottings.tenure_to_performance_plot(perfMat[:,1],user_ten, "Tenure", "Scores")
-		#plottings.scatterOfClusterResults(perfMat[:,1], perfMat[:,2], perfMat[:,3], questions, 'Scores', 'Times', 'Questions before Gold')
+	#Plot the results of the algorthim
+	#plottings.score_centroid_distributions(perfMat[:,1], centroids, centroids2)
+	#plottings.tenure_to_performance_plot(perfMat[:,1],user_ten, "Tenure", "Scores")
+	plottings.scatterOfClusterResults(perfMat[:,1], perfMat[:,2], perfMat[:,3], questions, 'Scores', 'Times', 'Questions before Gold')
 
-		## For a given project, once implemented the file would run the following function after the 
-		#questionsCap = [50, 400]
-		#secondRoundOutput = pf.secondRound(perfMat[:,1], newScores, questions[:,4:], centroids, centroids2, weights, questionsCap, perfMat)
-	print profit_sum3
-	print profit_sum2
-	print profit_norm *30
+	## For a given project, once implemented the file would run the following function after the 
+	#questionsCap = [50, 400]
+	#secondRoundOutput = pf.secondRound(perfMat[:,1], newScores, questions[:,4:], centroids, centroids2, weights, questionsCap, perfMat)
 	
-	print "Average Change before gold 2 centroids"
-	print averagesum_2
-	print "Average Change before gold 3 centroids"
-	print averagesum_3
-	
-	print "Less Gold"
-	lessGold = ((20/(averagesum_3+200))*300000)-((20/(200))*300000)
-	print lessGold
-	
-	print "Gold Savings"
-	goldSavings = lessGold*.03
-	print goldSavings
+	#Print Averages if run the full loop of average production
+	if loop:
+		print "Total Profit from 3 Cluster Algorithm: " + str(profit_sum3)
+		print "Total Profit from 2 Cluster Algorithm: " + str(profit_sum2)
+		print "Total Profit from Normal: " + str(profit_norm *30)
+		
+		print "Average Change before gold 2 centroids"
+		print averagesum_2
+		print "Average Change before gold 3 centroids"
+		print averagesum_3
+		
+		print "Less Gold"
+		lessGold = ((20/(averagesum_3+200))*300000)-((20/(200))*300000)
+		print lessGold
+		
+		print "Gold Savings"
+		goldSavings = lessGold*.03
+		print goldSavings
 
 	
 

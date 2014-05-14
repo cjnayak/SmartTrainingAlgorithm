@@ -23,7 +23,17 @@ python runner.py data/Getty_Training1.json batch 892
 ```
 If there is no batch with that number, or not batch specified, the script will default to the batch with the most tasks in the branch.
 
+You can also specify if you would like to run the centroid over a loop of 30 times to estimate the profit gains over the course of a full project.
+```
+python runner.py data/Getty_Training1.json run-loop
+```
+If this parameter is on, the centroid selection iterates through a loop 30 times.  This loop represents the number of gold batches all users must complete in order to finish an entire project of 300,000 tasks. These functions must also be run 30 times to decrease the variability of the k-means function that is generates random centroids.  Running the loop estimates the amount of gold saved, the cost savings, and the increased profit Samasource receives if it implements the smart gating Algorithm.  
+
+The complete loop file runs in under 2 minutes for the training sets.
+
 Plottings contains a number of functions that can be called to run graphs of the existing data.
+
+
 h2 Dependencies
 
 Our runner script has the following dependencies:
