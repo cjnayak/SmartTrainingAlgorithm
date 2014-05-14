@@ -41,7 +41,7 @@ Our runner script has the following dependencies:
  - Scikit learn
  - Matplot Lib
  
-h2 Old Code: the project's graveyard
+##Old Code: the project's graveyard
 
 A monty carlo simulation was developed for the threshold parameters and though not currently used, can be investigated to see what it outputs.
 Other unused bits of code can be found in the ```old`` folder.
