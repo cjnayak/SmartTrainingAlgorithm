@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import scipy.stats as stats
+from numpy import polyfit, poly1d
 
 def plot_hist(array, ylab, xlab, titl, bins):
 	plt.hist(array, bins)
@@ -14,6 +15,13 @@ def tenure_to_performance_plot(scores,tenure, xlab, ylab):
 	print slope
 	print r_value
 	plt.scatter(tenure,scores)
+	fit=polyfit(tenure,scores,1)
+	#slope, fit_fn=pl.poly1d(fit)
+	fit_fn=poly1d(fit)
+	plt.plot(tenure,fit_fn(tenure), '-b' )
+	plt.ylabel(ylab)
+	plt.xlabel(xlab)
+	plt.title("Scatter of Tenure to Performance for Current Batch")
 	plt.show()
 
 def score_centroid_distributions(array, cent3, cent2):
@@ -65,19 +73,24 @@ def questionLine(resultsMatrix):
 
 def scatterOfClusterResults(paramX, paramY, colorArray, resultsMatrix, xlab, ylab, zlab):
 	fig = plt.figure()
+	fig.set_size_inches(9,5)
+	fig.patch.set_facecolor('white')
 	at = fig.add_subplot(121, projection='3d')
 	sc = at.scatter(paramX,paramY, resultsMatrix[:,4], c=colorArray, marker='o', s=50)
-	sc.set_clim(vmin=0.97,vmax=0.999)
+	sc.set_clim(vmin=0.98,vmax=0.999)
 	at.set_xlabel(xlab)
 	at.set_ylabel(ylab)
 	at.set_zlabel(zlab)
-	at.set_zlim(100, 300)
+	at.set_title("3 Kmeans Clusters")
+	at.set_zlim(0, 400)
 	ax = fig.add_subplot(122, projection='3d')
 	sc2 = ax.scatter(paramX,paramY, resultsMatrix[:,5], c=colorArray, marker='o', s= 50)
-	sc2.set_clim(vmin=0.97,vmax=0.999)
+	sc2.set_clim(vmin=0.98,vmax=0.999)
 	ax.set_xlabel(xlab)
 	ax.set_ylabel(ylab)
-	ax.set_zlim(100, 300)
+	ax.set_zlim(0, 400)
+	ax.set_title("2 Kmeans Clusters")
+	fig.subplots_adjust(right=0.8)
 	fig.colorbar(sc)
 	plt.show()
 

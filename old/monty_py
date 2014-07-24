@@ -1,0 +1,8 @@
+maximum = -.5
+minimum = .5
+alpha = 0.01
+
+def monty_threshold(min, max, alpha):
+	return value
+
+
